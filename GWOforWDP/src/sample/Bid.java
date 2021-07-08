@@ -106,8 +106,8 @@ public class Bid {
     }
 
     public String toString(){
-        String s=this.id+" : Gain = "+this.gain+"\n";
-        s+="Lots :";
+        String s="ID: "+this.id+" \tValue = "+this.gain+"\n";
+        s+=+this.getLots().size()+" Items :";
         Iterator<Short> lots=this.lots.iterator();
         while(lots.hasNext()){
             s+=" "+lots.next();
@@ -116,59 +116,8 @@ public class Bid {
         return s;
     }
 
-    public Bid clone(){
-        Bid b=new Bid();
-        Iterator<Short> lots=this.lots.iterator();
-        while(lots.hasNext()){
-            b.addLot(lots.next());
-        }
-        Iterator<Bid> conflict=this.conflict.iterator();
-        while(conflict.hasNext()){
-            b.addConflict(conflict.next());
-        }
-        b.setGain(this.gain);
-        nbBids--;
-        b.setId(this.id);
-        return b;
-    }
-
-    public Bid inverse(Solution s){
-        Iterator<Bid> conflictIterator=this.conflict.iterator();
-        Bid b=null;
-        double gp=s.getGain();
-        while(conflictIterator.hasNext()){
-            Bid tmpBid=conflictIterator.next();
-
-            double tmpGp=0;
-            Iterator<Bid> tmpConflict=tmpBid.getConflict().iterator();
-            while(tmpConflict.hasNext()){
-                Bid tmpTmpBid=tmpConflict.next();
-                if(s.getBids().contains(tmpTmpBid)){
-                    tmpGp+=tmpTmpBid.getGain();
-                }
-            }
-            if(tmpGp<gp && !tmpBid.equals(this)){
-                gp=tmpGp;
-                b=tmpBid;
-            }
-        }
-
-        return b;
-    }
-
-    public int getId() {
-        return id;
-    }
-
     public void setId(int id) {
         this.id = id;
     }
-    /*
-    public boolean isSATby(Solution s){
-        for (Literal litteral : this.litterals) {
-            if (s.getSolution().get(litteral.getVar() - 1) == litteral.getVal())
-                return true;
-        }
-        return false;
-    }*/
+
 }

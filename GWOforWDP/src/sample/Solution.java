@@ -38,39 +38,6 @@ public class Solution {
         }
     }
 
-    public void forcedAddBid(Bid b){
-        Iterator<Bid> bids=this.bids.iterator();
-        ArrayList<Bid> toRemove=new ArrayList<Bid>();
-        while(bids.hasNext()){
-            Bid tmp=bids.next();
-            if(b.isInConflictWith(tmp)){
-                toRemove.add(tmp);
-                this.gain-=tmp.getGain();
-            }
-        }
-        Iterator<Bid> removes=toRemove.iterator();
-        while(removes.hasNext()){
-            this.bids.remove(removes.next());
-        }
-
-        this.setConflict();
-
-        this.bids.add(b);
-        this.concatConflict(b);
-        this.gain+=b.getGain();
-    }
-
-    public void forcedAddBid(Bid b,FormuleWDP f){
-        this.forcedAddBid(b);
-        Iterator<Bid> bidsIterator=f.getBids().iterator();
-        while(bidsIterator.hasNext()){
-            Bid tmp=bidsIterator.next();
-            if(!this.conflict.contains(tmp)){
-                this.addBid(tmp);
-            }
-        }
-    }
-
     public double getGain() {
         return gain;
     }
@@ -81,9 +48,9 @@ public class Solution {
 
     public void calculatePrice(){
         this.gain=0;
-        Iterator<Bid> bids=this.bids.iterator();
-        while(bids.hasNext()){
-            this.gain+=bids.next().getGain();
+        for (Bid bid : this.bids) {
+            //System.out.println( bid.getGain());
+            this.gain += bid.getGain();
         }
     }
 
@@ -155,7 +122,6 @@ public class Solution {
             r.add(tmp);
         }
 
-        System.out.println(r);
         int i=WDP.getNbBids()-1;
         while(i>=0){
             int index = r.indexOf(i);
@@ -163,7 +129,6 @@ public class Solution {
                 i--;
                 index=r.indexOf(i);
             }
-            System.out.println(WDP.getBids().get(index));
             Bid tmp=WDP.getBids().get(index);
             r.set(index,-1);
             if(!tmp.isInConflict(s.getBids())){
@@ -171,18 +136,7 @@ public class Solution {
             }
         }
         this.bids = s.getBids();
-        this.calculatePrice();
-    }
-
-    public ArrayList<Solution> flip(int flip) {
-        ArrayList<Solution> searchArea=new ArrayList<Solution>();
-        for(int i=0;i<flip;i++){
-            Solution s=this.clone();
-            for(int j=0;j*flip+i<s.bids.size();j++){
-                s.forcedAddBid(s.bids.get(j*flip+i).inverse(s));
-            }
-            searchArea.add(s);
-        }
-        return searchArea;
+        this.setConflict();
+        this.gain = s.getGain();
     }
 }

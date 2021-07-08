@@ -8,11 +8,16 @@ public class FormuleWDP {
     private ArrayList<Bid> bids;
     private short nbBids;
     private short nbLots;
-
+    private ArrayList<Integer> randomBids=new ArrayList<Integer>();
     public FormuleWDP(){
         this.bids=new ArrayList<Bid>();
         this.nbBids=0;
         this.nbLots=0;
+
+    }
+
+    public ArrayList<Integer> getRandomBids() {
+        return randomBids;
     }
 
     public FormuleWDP(String cheminFichier){
@@ -33,14 +38,21 @@ public class FormuleWDP {
                 }
                 bid.checkAddToConflict(this.bids);
                 this.bids.add(bid);
+
                 ligne=br.readLine();
             }
             br.close();
+
+            for(int i=0;i<this.getNbBids();i++){
+                int tmp=(int)(Math.random()*10000)%this.getNbLots();
+                randomBids.add(tmp);
+            }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 
     public ArrayList<Bid> getBids() {
@@ -77,43 +89,4 @@ public class FormuleWDP {
         s+="\n";
         return s;
     }
-
-    public Bid bestBid(Solution s){
-        Iterator<Bid> bids=this.bids.iterator();
-        Bid bestBid= null;
-        double bestGainBid=-10000;
-        while(bids.hasNext()){
-            Bid tmp=bids.next();
-            if(!s.getBids().contains(tmp)){
-                Iterator<Bid> conflicts=tmp.getConflict().iterator();
-                double perte=0;
-                while(conflicts.hasNext()){
-                    Bid tmpConflinct=conflicts.next();
-                    if(s.getBids().contains(tmpConflinct)){
-                        perte+=tmpConflinct.getGain();
-                    }
-                }
-                double gainBid=tmp.getGain()-perte;
-                if(gainBid>bestGainBid){
-                    bestGainBid=gainBid;
-                    bestBid=tmp.clone();
-                }
-            }
-        }
-        return bestBid;
-    }
-/*
-    //Méthode d'optimisation par essaim d'abeilles
-    public Solution beeSwarmOptimisation(int nbIterationsMax,int flip,int nbChancesMax){
-
-            //Recherche des abeilles successivement
-            while(searchArea.hasNext()){
-                Solution tmp=searchArea.next();
-                //System.out.println("le meilleur voisin à un nombre de clasuses sat= "+bestVoisin.getNbClausesSat());
-                Bid b=bestBid(tmp);
-                tmp.forcedAddBid(b,this);
-                danse.add(tmp);
-            }
-    }
- */
 }
