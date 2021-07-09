@@ -2,11 +2,10 @@ package sample;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 
 public class GWO {
     ArrayList<Wolf> wolfPack;
-    Solution solve(int popSize, int maxIterations, FormuleWDP WDP, Controller.AlgorithmeTask task) {
+    Solution solve(int popSize, int maxIterations, WDPinstance WDP, Controller.AlgorithmTask task) {
         // init for popSize with random key encoding
         wolfPack = new ArrayList<>();
 
@@ -28,24 +27,22 @@ public class GWO {
 // cancel button pressed
         if (task.isCancelled() ) {
             System.out.println("Canceling...");
-            //TODO : Change the solution to the real result
             return alpha;
         }
 
         int nbIteration=0;
         double a, r1, r2, alpha_ij, beta_ij, delta_ij, x_ij;
-        double A[] = new double[3];
-        double C[] = new double[3];
+        double[] A = new double[3];
+        double[] C = new double[3];
 
         while(nbIteration<maxIterations){
             if (task.isCancelled() ) {
                 System.out.println("Canceling...");
-                //TODO : Change the solution to the real result
                 return alpha;
             }
 
             a = 2 - nbIteration * ((2.0) / maxIterations);
-            for(int i=0; i<wolfPack.size(); i++) {
+            for (Wolf wolf : wolfPack) {
                 for (int k = 0; k < A.length; k++) {
                     r1 = Math.random();
                     r2 = Math.random();
@@ -53,14 +50,14 @@ public class GWO {
                     A[k] = 2 * a * r1 - a;
                     // Equation (3.4)
                     C[k] = 2 * r2;
-                    C[k] = (C[k]*wolfPack.get(i).getBids().size()) % wolfPack.get(i).getBids().size();
+                    C[k] = (C[k] * wolf.getBids().size()) % wolf.getBids().size();
                 }
                 //update the solution
 
                 alpha_ij = alpha.getPosition();
                 beta_ij = beta.getPosition();
                 delta_ij = delta.getPosition();
-                x_ij = wolfPack.get(i).getPosition();
+                x_ij = wolf.getPosition();
                 // Equation (3.5)-part 1
                 double d1 = Math.abs(C[0] * alpha_ij - x_ij);
                 double d2 = Math.abs(C[1] * beta_ij - x_ij);
@@ -69,9 +66,8 @@ public class GWO {
                 double x1 = alpha_ij - A[0] * d1;
                 double x2 = beta_ij - A[1] * d2;
                 double x3 = delta_ij - A[2] * d3;
-                wolfPack.get(i).setPosition((x1 + x2 + x3) / 3.0);
-                wolfPack.get(i).updatePosition(WDP);
-                //System.out.println(">"+wolfPack.get(i).getGain());
+                wolf.setPosition((x1 + x2 + x3) / 3.0);
+                wolf.updatePosition(WDP);
             }
             wolfPack.add(delta);
             wolfPack.add(beta);
@@ -86,13 +82,7 @@ public class GWO {
             wolfPack.remove(delta);
 
             nbIteration++;
-        }/*
-        System.out.println(alpha.getGain());
-        System.out.println(beta.getGain());
-        System.out.println(delta.getGain());
-        System.out.println("-----------");
-*/
-        //TODO : Change the solution to the real result
+        }
         return alpha;
     }
 }

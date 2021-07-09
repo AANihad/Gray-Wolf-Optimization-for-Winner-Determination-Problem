@@ -1,7 +1,6 @@
 package sample;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 public class Solution {
     private ArrayList<Bid> bids;
@@ -9,9 +8,9 @@ public class Solution {
     private double gain;    //fitness
 
     public Solution(){
-        this.bids=new ArrayList<Bid>();
+        this.bids=new ArrayList<>();
         this.gain=0;
-        this.conflict=new ArrayList<Bid>();
+        this.conflict=new ArrayList<>();
     }
 
     public ArrayList<Bid> getBids() {
@@ -29,10 +28,8 @@ public class Solution {
     }
 
     public void concatConflict(Bid b){
-        Iterator<Bid> conflictIterator=b.getConflict().iterator();
-        while(conflictIterator.hasNext()){
-            Bid tmp=conflictIterator.next();
-            if(!this.conflict.contains(tmp)){
+        for (Bid tmp : b.getConflict()) {
+            if (!this.conflict.contains(tmp)) {
                 this.conflict.add(tmp);
             }
         }
@@ -46,46 +43,28 @@ public class Solution {
         this.gain = gain;
     }
 
-    public void calculatePrice(){
-        this.gain=0;
-        for (Bid bid : this.bids) {
-            //System.out.println( bid.getGain());
-            this.gain += bid.getGain();
-        }
-    }
-
-    public Solution clone(){
-        Solution solution=new Solution();
-        Iterator<Bid> bids=this.bids.iterator();
-        while(bids.hasNext()){
-            solution.addBid(bids.next());
-        }
-        return solution;
-    }
-
     public String toString(){
-        String s="Gain de la solution = "+this.gain+"\n";
-        s+="Enchères de la solutions : \n";
-        Iterator<Bid> bids=this.bids.iterator();
-        while(bids.hasNext()){
-            s+=bids.next().toString();
+        StringBuilder s= new StringBuilder("Solution's Value = " + this.gain + "\n");
+        s.append("Solution's Bids : \n");
+        for (Bid bid : this.bids) {
+            s.append(bid.toString());
         }
-        return s;
+        return s.toString();
     }
 
     public boolean equals(Solution s){
         if(s==null || s.getGain()!=this.gain || s.getBids().size()!=this.bids.size()){
             return false;
         }
-        for(int i=0;i<this.bids.size();i++){
-            boolean same=false;
-            for(int j=0;j<s.getBids().size();j++){
-                if(this.bids.get(i).equals(s.getBids().get(j))){
-                    same=true;
+        for (Bid bid : this.bids) {
+            boolean same = false;
+            for (int j = 0; j < s.getBids().size(); j++) {
+                if (bid.equals(s.getBids().get(j))) {
+                    same = true;
                     break;
                 }
             }
-            if(!same){
+            if (!same) {
                 return false;
             }
         }
@@ -106,17 +85,15 @@ public class Solution {
     }
 
     public void setConflict(){
-        Iterator<Bid> bidsIterator=this.bids.iterator();
-        while(bidsIterator.hasNext()){
-            this.concatConflict(bidsIterator.next());
+        for (Bid bid : this.bids) {
+            this.concatConflict(bid);
         }
     }
 
     //Random key encoding algorithme modifié
-    public void genererRandom(FormuleWDP WDP){
+    public void genererRandom(WDPinstance WDP){
         Solution s=new Solution();
-        //Génération du vecteur r
-        ArrayList<Integer> r=new ArrayList<Integer>();
+        ArrayList<Integer> r=new ArrayList<>();
         for(int i=0;i<WDP.getNbBids();i++){
             int tmp=(int)(Math.random()*10000)%WDP.getNbLots();
             r.add(tmp);
@@ -131,7 +108,7 @@ public class Solution {
             }
             Bid tmp=WDP.getBids().get(index);
             r.set(index,-1);
-            if(!tmp.isInConflict(s.getBids())){
+            if(tmp.isInConflict(s.getBids())){
                 s.addBid(tmp);
             }
         }

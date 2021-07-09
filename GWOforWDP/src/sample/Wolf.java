@@ -21,30 +21,17 @@ public class Wolf extends Solution implements Comparable<Wolf>{
         return (int)(this.getGain() - w.getGain());
     }
 
-    public static Wolf XOR(Wolf x, Wolf y){
-//        System.out.println("xor");
-        int l = y.getBids().size();
-        Wolf re = new Wolf();
-        for (int i=0; i<l; i++)
-        {
-            if(x.getBids().contains(y.getBids().get(i)))
-                re.addBid(y.getBids().get(i));
-        }
-        return re;
-    }
-
     public static Wolf div(Wolf x, int a){
-//        System.out.println("div");
         int l = (int)(x.getBids().size() /a);
         Wolf w = new Wolf();
-        for (int i=0; i<l; i++){
+        for (int i=0; i<l; i++)
             w.addBid(x.getBids().get(i));
-        }
+
         w.setConflict();
         return w;
     }
 
-    public void updatePosition(FormuleWDP f) {
+    public void updatePosition(WDPinstance f) {
         int b = (int)( Math.abs(this.position) % this.getBids().size());
         b= (b==0)?1:b;
 
@@ -53,13 +40,12 @@ public class Wolf extends Solution implements Comparable<Wolf>{
         for (int bb = b, i=0; bb<w.getBids().size() && i<f.getRandomBids().size(); i++){
             int index =  f.getRandomBids().get(i);
             Bid tmp = f.getBids().get(index);
-            if (!tmp.isInConflict(w.getBids())) {
+            if (tmp.isInConflict(w.getBids())) {
                 w.getBids().add(tmp);
                 bb--;
             }
         }
 
-        //System.out.println("---------------");
         if (this.getGain() < w.getGain()){
             this.setBids(w.getBids());
             this.setConflict(w.getConflict());
